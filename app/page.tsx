@@ -4,6 +4,7 @@ import DataTable from "@/components/DataTable";
 import { emailError } from "@/components/EmailError";
 import Input from "@/components/Input";
 import useStore from "@/store/store";
+import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
@@ -12,6 +13,8 @@ export default function Home() {
   const addData = useStore(state => state.addData)
   // ----get store data
   const getData = useStore(state => state.data)
+  // Loading state
+  const [loading,setLoading] = useState(false)
   const {register,handleSubmit,reset} = useForm<FieldValues>({
     // defult values
     defaultValues: {
@@ -25,16 +28,20 @@ export default function Home() {
 const borderClass = "border-2 border-transparent focus:border-green-500 bg-neutral-300"
 // submit handler
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    setLoading(true)
     if( !data.name){
         toast.error("Please enter your name")
+        setLoading(false)
         return  
      }
      if(!data.email.match(emailError) ){
        toast.error("Please enter valid email")
+        setLoading(false)
        return
       } 
       if(!data.age || parseInt(data.age) === 0 || parseInt(data.age) < 0){
         toast.error("Please enter your valid age")
+        setLoading(false)
         return
       }
    const Data = {
@@ -44,6 +51,7 @@ const borderClass = "border-2 border-transparent focus:border-green-500 bg-neutr
    }
     addData(Data)
     toast.success("Successfully Add Data")
+    setLoading(false)
     reset()
     }
     // submit handler
@@ -69,7 +77,9 @@ const borderClass = "border-2 border-transparent focus:border-green-500 bg-neutr
                       {/* ---age input */}
                       {/* ----submit button--- */}
                       <Button  type="submit">
-                  Submit
+                    {
+                      loading ? "Loading..." : "Submit"
+                    }
               </Button>
                       {/* ----submit button--- */}
               </form>
